@@ -3,5 +3,8 @@
   "datetime_to":"20/04/2017",
   "fly_from":"LON",
   "fly_to":"SKG",
-  "currency":"GBP"
+  "currency":"GBP",
+  "arrival_day":"5",
+  "departure_day":"7",
+  "prediction_period_months":"3"
 }

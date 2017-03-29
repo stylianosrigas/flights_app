@@ -81,7 +81,9 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
     final_arrival_date = first_arrival_date + datetime.timedelta(days=div * 7)
     final_departure_date = first_departure_date + datetime.timedelta(days=div * 7)
 
-    print "The period that will be examined is from %s to %s" % (first_arrival_date, final_departure_date)
+    weekday_arrival = weekdays[str(first_arrival_date.weekday())]
+    weekday_departure = weekdays[str(final_departure_date.weekday())]
+    print "The period that I will search for cheap flights is from %s %s to %s %s" % (weekday_arrival, first_arrival_date, weekday_departure, final_departure_date)
     dates_search = []
     for x in range(0, div+1):
         dates_search.append([(first_arrival_date + datetime.timedelta(days=x * 7)),

@@ -90,5 +90,6 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
                                (first_departure_date + datetime.timedelta(days=x * 7))])
 
     return dates_search
-dates_search = date_prediction(config['first_arrival_date'], config['first_departure_date'], int(config['prediction_period_days']))
+
+dates_search = date_prediction(config['first_arrival_date'], config['first_departure_date'], config['prediction_period_days'])
 # search_flight(config['datetime_from'], config['datetime_to'], config['fly_from'], config['fly_to'], config['currency'])

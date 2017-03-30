@@ -30,13 +30,14 @@ with open('airlines.json') as data_file:
 def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency):
     """Find some cheap flight first
     """
+    print 'Searching for flights in %s - %s' % (datetime_from,datetime_to)
     url = "https://api.skypicker.com/flights?"
     params = "flyFrom=%s&to=%s&dateFrom=%s&dateTo=%s&partner=picky&passengers=1&curr=%s&directFlights=0&locale=GB" \
              % (fly_from, fly_to, datetime_from, datetime_to, currency)
     data = requests.get(url + params).json()['data']
-    # for i in data:
-    #     if len(i['route']) == 1:
-    #         print 'The flight is direct, the cost is %s %s and the airline is - %s' % (i['conversion'][currency], currency, airline_json[i['route'][0]['airline']])
+    for i in data:
+        if len(i['route']) == 1:
+            print 'The flight is direct, the cost is %s %s and the airline is - %s' % (i['conversion'][currency], currency, airline_json[i['route'][0]['airline']])
 
 
 def date_prediction(first_arrival_date, first_departure_date, prediction_period_days):
@@ -88,8 +89,16 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
     for x in range(0, div+1):
         dates_search.append([(first_arrival_date + datetime.timedelta(days=x * 7)),
                                (first_departure_date + datetime.timedelta(days=x * 7))])
+    for i in dates_search:
+        i[0] = str(i[0])
+        year, month, day = i[0].split("-")
+        i[0] = "%s/%s/%s" % (day,month,year)
+        i[1] = str(i[1])
+        year, month, day = i[1].split("-")
+        i[1] = "%s/%s/%s" % (day,month,year)
 
     return dates_search
 
 dates_search = date_prediction(config['first_arrival_date'], config['first_departure_date'], config['prediction_period_days'])
-# search_flight(config['datetime_from'], config['datetime_to'], config['fly_from'], config['fly_to'], config['currency'])
+for i in dates_search:
+    search_flight(i[0], i[1], config['fly_from'], config['fly_to'], config['currency'])

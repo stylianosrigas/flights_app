@@ -4,6 +4,7 @@ import json
 import datetime
 from dateutil.relativedelta import relativedelta
 from datetime import date
+import time
 
 with open('config.json') as data_file:
     config = json.load(data_file)
@@ -11,33 +12,36 @@ with open('airlines.json') as data_file:
     airline_json = json.load(data_file)
 
 
-# request = Request('https://api.skypicker.com/flights?flyFrom=STN&to=SKG&dateFrom=10/04/2017&dateTo=20/05/2017&sort=price&curr=EUR&partner=picky')
-#
-# response = urlopen(request)
-# results = response.read()
-# print results
 
 
-# def airline_name(airline_json, name_check):
-#     for i in airline_json:
-#         if airline_json['na'] == (name_check.encode('utf-8')):
-#             return_value = i['name'].encode('utf-8')
-#         else:
-#             return_value = 'Error - Airline name not found'
-#     return return_value
-
-
-def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency):
+def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency, check_time, flight_type):
     """Find some cheap flight first
     """
-    print 'Searching for flights in %s - %s' % (datetime_from,datetime_to)
     url = "https://api.skypicker.com/flights?"
     params = "flyFrom=%s&to=%s&dateFrom=%s&dateTo=%s&partner=picky&passengers=1&curr=%s&directFlights=0&locale=GB" \
              % (fly_from, fly_to, datetime_from, datetime_to, currency)
     data = requests.get(url + params).json()['data']
+    flight_check = False
     for i in data:
         if len(i['route']) == 1:
-            print 'The flight is direct, the cost is %s %s and the airline is - %s' % (i['conversion'][currency], currency, airline_json[i['route'][0]['airline']])
+            departure_time = time.strftime("%H:%M", time.localtime(i['dTime']))
+            arrival_time = time.strftime("%H:%M", time.localtime(i['aTime']))
+            cost = 100000
+            if departure_time > time.strftime(check_time):
+                flight_check = True
+                if i['conversion'][currency] < cost:
+                    cost = i['conversion'][currency]
+                    flight_number = i
+    if flight_check == False:
+        print '%s - No flight available on this time' % flight_type
+    else:
+        departure_time = time.strftime("%H:%M", time.localtime(flight_number['dTime']))
+        arrival_time = time.strftime("%H:%M", time.localtime(flight_number['aTime']))
+        print '%s - The flight is from %s to %s' % (flight_type, flight_number['cityFrom'], flight_number['cityTo'])
+        print '%s - The airport is from  %s to %s and the airline %s' % (flight_type, flight_number['flyFrom'], flight_number['flyTo'], airline_json[flight_number['route'][0]['airline']] )
+        print '%s - The flight is direct, the cost is %s %s' % (flight_type, flight_number['conversion'][currency], currency)
+        print '%s - Departure Time - %s and Arrival Time - %s' % (flight_type, departure_time, arrival_time)
+
 
 
 def date_prediction(first_arrival_date, first_departure_date, prediction_period_days):
@@ -56,24 +60,6 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
         "6": "Sunday"
     }
 
-    # now = datetime.datetime.now()
-    # current_year = now.year
-    # current_month = now.month
-    # current_day = now.day
-    # day_of_the_week = now.weekday()
-    # future_date = date.today() + relativedelta(months=+config['prediction_period_months'])
-    # future_day = future_date.day
-    # future_month = future_date.month
-    # future_year = future_date.year
-    # print "The period that will be examined is from %s/%s/%s to %s/%s/%s" % (current_day, current_month, current_year, future_day, future_month, future_year)
-    # if day_of_the_week < config['arrival_day']:
-    #     start_arrival_day = current_day+(config['arrival_day']-day_of_the_week)
-    #     if config['arrival_day'] < config['departure_day']:
-    #         start_departure_day = start_arrival_day + (config['departure_day']-config['arrival_day'])
-    #     else:
-    #         print 'The script right supports only prediction inside the same week.'
-    # else
-
     first_arrival_date = date(config['first_arrival_date'][0], config['first_arrival_date'][1],
                               config['first_arrival_date'][2])
     first_departure_date = date(config['first_departure_date'][0], config['first_departure_date'][1],
@@ -84,7 +70,8 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
 
     weekday_arrival = weekdays[str(first_arrival_date.weekday())]
     weekday_departure = weekdays[str(final_departure_date.weekday())]
-    print "The period that I will search for cheap flights is from %s %s to %s %s" % (weekday_arrival, first_arrival_date, weekday_departure, final_departure_date)
+    print "INFO - The period that I will search for cheap flights is from %s %s to %s %s" % (weekday_arrival, first_arrival_date, weekday_departure, final_departure_date)
+    print ''
     dates_search = []
     for x in range(0, div+1):
         dates_search.append([(first_arrival_date + datetime.timedelta(days=x * 7)),
@@ -92,13 +79,19 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
     for i in dates_search:
         i[0] = str(i[0])
         year, month, day = i[0].split("-")
-        i[0] = "%s/%s/%s" % (day,month,year)
+        i[0] = "%s/%s/%s" % (day, month, year)
         i[1] = str(i[1])
         year, month, day = i[1].split("-")
-        i[1] = "%s/%s/%s" % (day,month,year)
+        i[1] = "%s/%s/%s" % (day, month, year)
 
     return dates_search
 
 dates_search = date_prediction(config['first_arrival_date'], config['first_departure_date'], config['prediction_period_days'])
 for i in dates_search:
-    search_flight(i[0], i[1], config['fly_from'], config['fly_to'], config['currency'])
+    print 'Searching for flights in %s - %s' % (i[0], i[1])
+    print '******* DEPARTURE *************'
+    search_flight(i[0], i[0], config['fly_from'], config['fly_to'], config['currency'], (config['first_day_departure_time']), 'departure')
+    print '******* RETURN *************'
+    search_flight(i[1], i[1], config['fly_to'], config['fly_from'], config['currency'], (config['last_day_departure_time']), 'return')
+    print ''
+    print ''

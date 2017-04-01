@@ -31,16 +31,17 @@ def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency, check_
                 flight_check = True
                 if i['conversion'][currency] < cost:
                     cost = i['conversion'][currency]
-                    flight_number = i
+                    flight_payload = i
     if flight_check == False:
         print '%s - No flight available on this time' % flight_type
     else:
-        departure_time = time.strftime("%H:%M", time.localtime(flight_number['dTime']))
-        arrival_time = time.strftime("%H:%M", time.localtime(flight_number['aTime']))
-        print '%s - The flight is from %s to %s' % (flight_type, flight_number['cityFrom'], flight_number['cityTo'])
-        print '%s - The airport is from  %s to %s and the airline %s' % (flight_type, flight_number['flyFrom'], flight_number['flyTo'], airline_json[flight_number['route'][0]['airline']] )
-        print '%s - The flight is direct, the cost is %s %s' % (flight_type, flight_number['conversion'][currency], currency)
+        departure_time = time.strftime("%H:%M", time.localtime(flight_payload['dTime']))
+        arrival_time = time.strftime("%H:%M", time.localtime(flight_payload['aTime']))
+        print '%s - The flight is from %s to %s' % (flight_type, flight_payload['cityFrom'], flight_payload['cityTo'])
+        print '%s - The airport is from  %s to %s and the airline %s' % (flight_type, flight_payload['flyFrom'], flight_payload['flyTo'], airline_json[flight_payload['route'][0]['airline']] )
+        print '%s - The flight is direct, the cost is %s %s' % (flight_type, flight_payload['conversion'][currency], currency)
         print '%s - Departure Time - %s and Arrival Time - %s' % (flight_type, departure_time, arrival_time)
+        return flight_payload
 
 
 
@@ -70,6 +71,7 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
 
     weekday_arrival = weekdays[str(first_arrival_date.weekday())]
     weekday_departure = weekdays[str(final_departure_date.weekday())]
+    print ''
     print "INFO - The period that I will search for cheap flights is from %s %s to %s %s" % (weekday_arrival, first_arrival_date, weekday_departure, final_departure_date)
     print ''
     dates_search = []
@@ -87,11 +89,22 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
     return dates_search
 
 dates_search = date_prediction(config['first_arrival_date'], config['first_departure_date'], config['prediction_period_days'])
+total_cost = 10000
 for i in dates_search:
     print 'Searching for flights in %s - %s' % (i[0], i[1])
     print '******* DEPARTURE *************'
-    search_flight(i[0], i[0], config['fly_from'], config['fly_to'], config['currency'], (config['first_day_departure_time']), 'departure')
+    flight_payload_depar = search_flight(i[0], i[0], config['fly_from'], config['fly_to'], config['currency'], (config['first_day_departure_time']), 'departure')
     print '******* RETURN *************'
-    search_flight(i[1], i[1], config['fly_to'], config['fly_from'], config['currency'], (config['last_day_departure_time']), 'return')
+    flight_payload_ret = search_flight(i[1], i[1], config['fly_to'], config['fly_from'], config['currency'], (config['last_day_departure_time']), 'return')
     print ''
     print ''
+    try:
+        if (flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][config['currency']]) < total_cost:
+            total_cost = (flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][config['currency']])
+            flight_payload_departure = flight_payload_depar
+            flight_payload_return = flight_payload_ret
+    except:
+        pass
+
+
+

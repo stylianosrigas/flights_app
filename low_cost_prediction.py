@@ -10,7 +10,18 @@ with open('config.json') as data_file:
     config = json.load(data_file)
 with open('airlines.json') as data_file:
     airline_json = json.load(data_file)
+with open('airports.json') as data_file:
+    airports_json = json.load(data_file)
 
+weekdays = {
+    "0": "Monday",
+    "1": "Tuesday",
+    "2": "Wednesday",
+    "3": "Thursday",
+    "4": "Friday",
+    "5": "Saturday",
+    "6": "Sunday"
+}
 
 
 
@@ -45,21 +56,13 @@ def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency, check_
 
 
 
-def date_prediction(first_arrival_date, first_departure_date, prediction_period_days):
+def date_prediction(first_arrival_date, first_departure_date, prediction_period_days, weekdays):
     """
     We need a method that takes the first_arrival_date, the first_departure_date and the prediction_period_months. Calculates the current date and returns a dictionary of all the available datetime_from and datetime_to
      that we will search the prices for.
     :return: 
     """
-    weekdays = {
-        "0": "Monday",
-        "1": "Tuesday",
-        "2": "Wednesday",
-        "3": "Thursday",
-        "4": "Friday",
-        "5": "Saturday",
-        "6": "Sunday"
-    }
+
 
     first_arrival_date = date(config['first_arrival_date'][0], config['first_arrival_date'][1],
                               config['first_arrival_date'][2])
@@ -88,23 +91,53 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
 
     return dates_search
 
-dates_search = date_prediction(config['first_arrival_date'], config['first_departure_date'], config['prediction_period_days'])
-total_cost = 10000
-for i in dates_search:
-    print 'Searching for flights in %s - %s' % (i[0], i[1])
-    print '******* DEPARTURE *************'
-    flight_payload_depar = search_flight(i[0], i[0], config['fly_from'], config['fly_to'], config['currency'], (config['first_day_departure_time']), 'departure')
-    print '******* RETURN *************'
-    flight_payload_ret = search_flight(i[1], i[1], config['fly_to'], config['fly_from'], config['currency'], (config['last_day_departure_time']), 'return')
-    print ''
-    print ''
-    try:
-        if (flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][config['currency']]) < total_cost:
-            total_cost = (flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][config['currency']])
-            flight_payload_departure = flight_payload_depar
-            flight_payload_return = flight_payload_ret
-    except:
-        pass
+def main():
+    total_cost = 10000
+    for destination in config['fly_to']:
+        for airport in airports_json:
+            if airport['iata'] == destination:
+                airport_name = airport['name']
+        print 'Searching for cheap flights to %s - %s' %(destination, airport_name)
+        dates_search = date_prediction(config['first_arrival_date'], config['first_departure_date'], config['prediction_period_days'], weekdays)
+        for i in dates_search:
+            print 'Searching for flights in %s - %s' % (i[0], i[1])
+            print '******* DEPARTURE *************'
+            flight_payload_depar = search_flight(i[0], i[0], config['fly_from'], destination, config['currency'], (config['first_day_departure_time']), 'departure')
+            print '******* RETURN *************'
+            flight_payload_ret = search_flight(i[1], i[1], destination, config['fly_from'], config['currency'], (config['last_day_departure_time']), 'return')
+            print ''
+            print ''
+            try:
+                if (flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][config['currency']]) < total_cost:
+                    total_cost = (flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][config['currency']])
+                    flight_payload_departure = flight_payload_depar
+                    flight_payload_return = flight_payload_ret
+                    date = i
+            except:
+                pass
+
+
+    print "--------------------------------------------------------------------------------------------------------"
+    print "--------------------------------------------------------------------------------------------------------"
+    print "The best dates to fly are %s - %s" % (date[0], date[1])
+    print 'The cheapest flight is from %s to %s and return from %s to %s' % (flight_payload_departure['cityFrom'], flight_payload_departure['cityTo'], flight_payload_return['cityFrom'], flight_payload_return['cityTo'])
+    print 'The airport is from  %s to %s and return from %s to %s' % (flight_payload_departure['flyFrom'], flight_payload_departure['flyTo'], flight_payload_return['flyFrom'], flight_payload_return['flyTo'])
+    if (airline_json[flight_payload_departure['route'][0]['airline']] == airline_json[flight_payload_return['route'][0]['airline']]):
+        print "The airline for both flights is %s" % (airline_json[flight_payload_departure['route'][0]['airline']])
+    else:
+        print "The airline is %s and for return %s" % (airline_json[flight_payload_departure['route'][0]['airline']], airline_json[flight_payload_return['route'][0]['airline']])
+    print 'The flight is direct and the total cost is %s' % (total_cost)
+    departure_time_first_flight = time.strftime("%H:%M", time.localtime(flight_payload_departure['dTime']))
+    arrival_time_first_flight = time.strftime("%H:%M", time.localtime(flight_payload_departure['aTime']))
+    departure_time_second_flight = time.strftime("%H:%M", time.localtime(flight_payload_return['dTime']))
+    arrival_time_second_flight = time.strftime("%H:%M", time.localtime(flight_payload_return['aTime']))
+    print 'Departure and Arrival Times:'
+    print "%s-%s" % (departure_time_first_flight, arrival_time_first_flight)
+    print "%s-%s" % (departure_time_second_flight, arrival_time_second_flight)
+    print "--------------------------------------------------------------------------------------------------------"
+    print "--------------------------------------------------------------------------------------------------------"
 
 
 
+if __name__ == '__main__':
+    main()

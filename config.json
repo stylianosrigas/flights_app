@@ -2,11 +2,11 @@
   "datetime_from":"31/03/2017",
   "datetime_to":"20/04/2017",
   "fly_from":"LON",
-  "fly_to":"SKG",
+  "fly_to":["SKG", "BCN", "IBZ", "PMI", "AGP", "LIS"],
   "currency":"GBP",
-  "first_arrival_date":[2017,4,2],
-  "first_departure_date":[2017,4,9],
-  "prediction_period_days":90,
-  "first_day_departure_time": "16:00",
-  "last_day_departure_time": "19:00"
+  "first_arrival_date":[2017,6,2],
+  "first_departure_date":[2017,6,4],
+  "prediction_period_days":40,
+  "first_day_departure_time": "19:00",
+  "last_day_departure_time": "18:00"
 }

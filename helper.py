@@ -1,5 +1,8 @@
-import time
-b = time.strftime("%H:%M", time.localtime(1490942400))
-a = time.strftime("05:10")
-if b>a:
-    print "ok"
+import json
+
+with open('airports.json') as data_file:
+    airports_json = json.load(data_file)
+
+for airport in airports_json:
+    if airport['iata'] == destination:
+        airport_name = airport['name']

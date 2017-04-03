@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="49dea8f6-00cc-49ce-a4c8-04e590129246" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/airlines.json" afterPath="$PROJECT_DIR$/airlines.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.json" afterPath="$PROJECT_DIR$/config.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/helper.py" afterPath="$PROJECT_DIR$/helper.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/low_cost_prediction.py" afterPath="$PROJECT_DIR$/low_cost_prediction.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -57,8 +56,8 @@
       <file leaf-file-name="airlines.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/airlines.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="93">
-              <caret line="752" column="17" lean-forward="false" selection-start-line="752" selection-start-column="16" selection-end-line="752" selection-end-column="17" />
+            <state relative-caret-position="204">
+              <caret line="255" column="5" lean-forward="false" selection-start-line="255" selection-start-column="5" selection-end-line="255" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -67,8 +66,8 @@
       <file leaf-file-name="config.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/config.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="32" lean-forward="false" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
+            <state relative-caret-position="120">
+              <caret line="8" column="29" lean-forward="false" selection-start-line="8" selection-start-column="29" selection-end-line="8" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -120,10 +119,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/.idea/airlines_helper.json" />
-        <option value="$PROJECT_DIR$/airlines.json" />
         <option value="$PROJECT_DIR$/airports.json" />
         <option value="$PROJECT_DIR$/helper.py" />
         <option value="$PROJECT_DIR$/low_cost_prediction.py" />
+        <option value="$PROJECT_DIR$/airlines.json" />
         <option value="$PROJECT_DIR$/config.json" />
       </list>
     </option>
@@ -803,7 +802,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31644000" />
+    <option name="totallyTimeSpent" value="32338000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1120,14 +1119,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/airlines.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="93">
-          <caret line="752" column="17" lean-forward="false" selection-start-line="752" selection-start-column="16" selection-end-line="752" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/helper.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -1154,10 +1145,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/airlines.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="255" column="5" lean-forward="false" selection-start-line="255" selection-start-column="5" selection-end-line="255" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/config.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="32" lean-forward="false" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
+        <state relative-caret-position="120">
+          <caret line="8" column="29" lean-forward="false" selection-start-line="8" selection-start-column="29" selection-end-line="8" selection-end-column="29" />
           <folding />
         </state>
       </provider>

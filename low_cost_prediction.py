@@ -23,6 +23,7 @@ weekdays = {
     "6": "Sunday"
 }
 
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -33,7 +34,8 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency, check_time, flight_type):
+
+def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency, check_time, check_time_two, flight_type):
     """Find some cheap flight first
     """
     url = "https://api.skypicker.com/flights?"
@@ -46,7 +48,7 @@ def search_flight(datetime_from, datetime_to, fly_from, fly_to, currency, check_
             departure_time = time.strftime("%H:%M", time.localtime(i['dTime']))
             arrival_time = time.strftime("%H:%M", time.localtime(i['aTime']))
             cost = 100000
-            if departure_time > time.strftime(check_time):
+            if (departure_time > time.strftime(check_time)) and departure_time < time.strftime(check_time_two):
                 flight_check = True
                 if i['conversion'][currency] < cost:
                     cost = i['conversion'][currency]
@@ -83,7 +85,7 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
     weekday_departure = weekdays[str(final_departure_date.weekday())]
     print ''
     print bcolors.OKBLUE + "INFO - The period that I will search for cheap flights in destination - %s is from %s %s to %s %s" % (
-    destination, weekday_arrival, first_arrival_date, weekday_departure, final_departure_date) + bcolors.ENDC
+        destination, weekday_arrival, first_arrival_date, weekday_departure, final_departure_date) + bcolors.ENDC
     print ''
     dates_search = []
     for x in range(0, div + 1):
@@ -99,8 +101,8 @@ def date_prediction(first_arrival_date, first_departure_date, prediction_period_
 
     return dates_search
 
-def print_results(best_zero, best_one, date_zero, date_one):
 
+def print_results(best_zero, best_one, date_zero, date_one):
     print bcolors.HEADER + "---------------------------------------------------------------------------------------------------------------------------" + bcolors.ENDC
     print bcolors.HEADER + "---------------------------------------------------------------------------------------------------------------------------" + bcolors.ENDC
     print "The best dates to fly are %s - %s" % (date_zero, date_one)
@@ -144,18 +146,20 @@ def main():
             print 'Searching for flights in %s - %s' % (i[0], i[1])
             # print '******* DEPARTURE *************'
             flight_payload_depar = search_flight(i[0], i[0], config['fly_from'], destination, config['currency'],
-                                                 (config['first_day_departure_time']), 'departure')
+                                                 (config['first_day_departure_time'][0]),
+                                                 (config['first_day_departure_time'][1]), 'departure')
             # print '******* RETURN *************'
             flight_payload_ret = search_flight(i[1], i[1], destination, config['fly_from'], config['currency'],
-                                               (config['last_day_departure_time']), 'return')
+                                               (config['last_day_departure_time'][0]),
+                                               (config['last_day_departure_time'][1]), 'return')
             # print ''
             # print ''
             try:
                 if (flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][
                     config['currency']]) < total_cost:
                     total_cost = (
-                    flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][
-                        config['currency']])
+                        flight_payload_depar['conversion'][config['currency']] + flight_payload_ret['conversion'][
+                            config['currency']])
                     flight_payload_departure = flight_payload_depar
                     flight_payload_return = flight_payload_ret
                     date = i
@@ -173,31 +177,6 @@ def main():
         if best_option is not 'N/A':
             print_results(best_option[0], best_option[1], date[0], date[1])
 
-            # print bcolors.HEADER + "---------------------------------------------------------------------------------------------------------------------------" + bcolors.ENDC
-            # print bcolors.HEADER + "---------------------------------------------------------------------------------------------------------------------------" + bcolors.ENDC
-            # print "The best dates to fly are %s - %s" % (date[0], date[1])
-            # print 'The cheapest flight is from %s to %s and return from %s to %s' % (
-            # best_option[0]['cityFrom'], best_option[0]['cityTo'], best_option[1]['cityFrom'], best_option[1]['cityTo'])
-            # print 'The airport is from  %s to %s and return from %s to %s' % (
-            # best_option[0]['flyFrom'], best_option[0]['flyTo'], best_option[1]['flyFrom'], best_option[1]['flyTo'])
-            # if (airline_json[best_option[0]['route'][0]['airline']] == airline_json[
-            #     best_option[1]['route'][0]['airline']]):
-            #     print "The airline for both flights is %s" % (airline_json[best_option[0]['route'][0]['airline']])
-            # else:
-            #     print "The airline is %s and for return %s" % (airline_json[best_option[0]['route'][0]['airline']],
-            #                                                    airline_json[best_option[1]['route'][0]['airline']])
-            # print 'The flight is direct and the total cost is %s' % (
-            # best_option[0]['conversion'][config['currency']] + best_option[1]['conversion'][config['currency']])
-            # departure_time_first_flight = time.strftime("%H:%M", time.localtime(best_option[0]['dTime']))
-            # arrival_time_first_flight = time.strftime("%H:%M", time.localtime(best_option[0]['aTime']))
-            # departure_time_second_flight = time.strftime("%H:%M", time.localtime(best_option[1]['dTime']))
-            # arrival_time_second_flight = time.strftime("%H:%M", time.localtime(best_option[1]['aTime']))
-            # print 'Departure and Arrival Times:'
-            # print "%s-%s" % (departure_time_first_flight, arrival_time_first_flight)
-            # print "%s-%s" % (departure_time_second_flight, arrival_time_second_flight)
-            # print bcolors.HEADER + "---------------------------------------------------------------------------------------------------------------------------" + bcolors.ENDC
-            # print bcolors.HEADER + "---------------------------------------------------------------------------------------------------------------------------" + bcolors.ENDC
-            #
 
 if __name__ == '__main__':
     main()

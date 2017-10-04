@@ -9,6 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pylab
 
+with open('airlines.json') as data_file:
+    airline_json = json.load(data_file)
+with open('airports.json') as data_file:
+    airports_json = json.load(data_file)
 
 def main():
     search_builder()
@@ -28,37 +32,89 @@ def search_builder():
         "6": "Sunday"
     }
     summary = {}
+    optimised_summary = {}
     for destination in config['fly_to']:
         summary[destination] = []
+        optimised_summary[destination] = {"departure": {"data": "", "date": ""}, "return": {"data": "", "date": ""}}
         dates_search = date_prediction(config, weekdays, destination)
+        departure_cost = 1000000
+        return_cost = 1000000
         for date in dates_search:
             print 'Examining departure for destination - %s for period %s' % (destination, date[0])
             data = search_flight(config['fly_from'], destination, date[0],
                                  date[0], config['currency'])
             departure_flight_data = find_cheapest_flight(data, config, 'departure_flight', config['currency'])
+
+
             print 'Examining return for destination - %s for period %s' % (destination, date[1])
             data = search_flight(destination, config['fly_from'], date[1],
                                  date[1], config['currency'])
             return_flight_data = find_cheapest_flight(data, config, 'return_flight', config['currency'])
 
+
             if departure_flight_data != 'NO FLIGHTS' and return_flight_data != 'NO FLIGHTS':
+                if departure_flight_data['conversion'][config['currency']] < departure_cost:
+                    best_departure_flight_data = departure_flight_data
+                    departure_cost = departure_flight_data['conversion'][config['currency']]
+                    best_departure_date = date[0]
+                if return_flight_data['conversion'][config['currency']] < return_cost:
+                    best_return_flight_data = return_flight_data
+                    return_cost = return_flight_data['conversion'][config['currency']]
+                    best_return_date = date[1]
                 total_cost = departure_flight_data['conversion'][config['currency']] + return_flight_data['conversion'][config['currency']]
                 summary[destination].append({'date': (date[0]+'-'+date[1]), 'total_cost': total_cost})
 
+        optimised_summary[destination]['departure']['data'] = best_departure_flight_data
+        optimised_summary[destination]['departure']['date'] = best_departure_date
+        optimised_summary[destination]['return']['data'] = best_return_flight_data
+        optimised_summary[destination]['return']['date'] = best_return_date
+
         plot_data(destination, summary, config)
-    plt.legend()
-    plt.show()
+
     with open('detailed_data.json', 'w') as outfile:
         json.dump(summary, outfile)
-    create_optimised_data(summary)
+    create_optimised_data(optimised_summary)
+    plt.legend()
+    plt.show()
 
-def create_optimised_data(summary):
-    pass
+
+def create_optimised_data(optimised_summary):
+
+    data = {}
+    for destination in optimised_summary:
+        destination_data = optimised_summary[destination]
+        data[destination] = \
+            {
+                "departure": [],
+                "return": []
+            }
+        data[destination]['departure'].append({
+            "departure_date": destination_data['departure']['date'],
+            "departure_time": time.strftime("%H:%M", time.localtime(destination_data['departure']['data']['dTime'])),
+            "arrival_time": time.strftime("%H:%M", time.localtime(destination_data['departure']['data']['aTime'])),
+            "departure_airport": destination_data['departure']['data']['flyFrom'],
+            "arrival_airport": destination_data['departure']['data']['flyTo'],
+            "airline": "",
+            "direct_flight": ""
+        })
+        data[destination]['return'].append({
+            "departure_date": destination_data['return']['date'],
+            "departure_time": time.strftime("%H:%M", time.localtime(destination_data['return']['data']['dTime'])),
+            "arrival_time": time.strftime("%H:%M", time.localtime(destination_data['return']['data']['aTime'])),
+            "departure_airport": destination_data['return']['data']['flyFrom'],
+            "arrival_airport": destination_data['return']['data']['flyTo'],
+            "airline": "",
+            "direct_flight": ""
+        })
+    print data
+    with open('optimised_data.json', 'w') as outfile:
+        json.dumps(data, outfile)
+
 
 def plot_data(destination, summary, config):
     axis_font = {'fontname': 'Arial', 'size': '10'}
-    plt.xlabel("Dates", **axis_font)
-    plt.ylabel("Total Flight Cost (%s)" % config['currency'], **axis_font)
+    plt.xlabel('Dates', **axis_font)
+    plt.ylabel('Total Flight Cost (%s)' % config['currency'], **axis_font)
     x_list = []
     y_list = []
     my_xticks = []

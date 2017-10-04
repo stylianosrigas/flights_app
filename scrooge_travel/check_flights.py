@@ -48,8 +48,12 @@ def search_builder():
         plot_data(destination, summary, config)
     plt.legend()
     plt.show()
-    with open('data.json', 'w') as outfile:
+    with open('detailed_data.json', 'w') as outfile:
         json.dump(summary, outfile)
+    create_optimised_data(summary)
+
+def create_optimised_data(summary):
+    pass
 
 def plot_data(destination, summary, config):
     axis_font = {'fontname': 'Arial', 'size': '10'}
@@ -67,7 +71,6 @@ def plot_data(destination, summary, config):
     plt.xticks(x, my_xticks, size=7, rotation=30)
     plt.title('Scrooge Travel')
     plt.plot(x, y, label=destination, ls='--', linewidth=2, marker='o', markersize=6)
-    pylab.ion()
 
 
 

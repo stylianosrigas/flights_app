@@ -1,6 +1,6 @@
 {
   "fly_from":"LON",
-  "fly_to":["OSL", "BCN", "PRG", "ARN", "MLA", "VIE"],
+  "fly_to":["OSL", "BCN", "PRG", "MAD", "AMS", "VIE", "BER"],
   "currency":"GBP",
   "prediction_period_days":200,
   "departure_flight" : {

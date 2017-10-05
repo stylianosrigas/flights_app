@@ -1,18 +1,18 @@
 {
   "fly_from":"LON",
-  "fly_to":["BCN"],
+  "fly_to":["BCN", "PRG", "MAD", "VIE", "BER", "MUC"],
   "currency":"GBP",
-  "prediction_period_days":200,
+  "prediction_period_days":21,
   "departure_flight" : {
     "departure_time": "18:30",
     "arrival_time": "23:59",
-    "departure_date": [2017,11,3],
+    "departure_date": [2018, 2, 2],
     "direct_flight": "False"
   },
   "return_flight" : {
     "departure_time": "18:00",
     "arrival_time": "23:59",
-    "departure_date": [2017,11,5],
+    "departure_date": [2018, 2, 4],
     "direct_flight": "False"
   }
 }

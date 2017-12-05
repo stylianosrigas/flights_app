@@ -1,0 +1,19 @@
+{
+  "functionality": "flight_trends",
+  "fly_from": "LON",
+  "fly_to": "NYC",
+  "currency": "GBP",
+  "prediction_period_days": 20,
+  "departure_flight" : {
+    "departure_time": "00:01",
+    "arrival_time": "23:59",
+    "departure_date": [2017, 11, 20],
+    "direct_flight": "True"
+  },
+  "return_flight" : {
+    "departure_time": "00:01",
+    "arrival_time": "23:59",
+    "departure_date": [2017, 11, 20],
+    "direct_flight": "True"
+  }
+}

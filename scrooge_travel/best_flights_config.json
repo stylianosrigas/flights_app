@@ -1,0 +1,19 @@
+{
+  "functionality": "best_flights",
+  "fly_from": "LON",
+  "fly_to": ["BCN"],
+  "currency": "GBP",
+  "prediction_period_days": 120,
+  "departure_flight" : {
+    "departure_time": "18:30",
+    "arrival_time": "23:59",
+    "departure_date": [2018, 2, 16],
+    "direct_flight": "True"
+  },
+  "return_flight" : {
+    "departure_time": "18:00",
+    "arrival_time": "23:59",
+    "departure_date": [2018, 2, 18],
+    "direct_flight": "True"
+  }
+}
